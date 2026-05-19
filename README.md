@@ -71,6 +71,24 @@ trained on calm periods systematically underestimate tail risk.
 
 ![PCA Decomposition](pca_decomposition.png)
 
+### VaR Backtest Results
+
+| Metric | Value |
+|--------|-------|
+| Test Period | 2009–2026 |
+| Total Trading Days | 4,370 |
+| VaR Exceptions | 231 days |
+| Exception Rate | 5.29% |
+| Basel Status | ⚠ Yellow Zone |
+
+![VaR Backtest](var_backtest.png)
+
+**Key insight:** The rolling exception rate spikes above the Basel red zone 
+(8%) during every major crisis — 2011, 2016, 2018, 2020, 2022 — confirming 
+that historical simulation VaR systematically underestimates tail risk during 
+stress periods. This motivates the use of stressed VaR and scenario analysis 
+as complements to standard VaR models.
+
 ## Tech Stack
 - Python 3.10
 - pandas, numpy, scipy, scikit-learn
@@ -82,3 +100,4 @@ trained on calm periods systematically underestimate tail risk.
 pip install numpy pandas matplotlib seaborn yfinance scipy scikit-learn
 jupyter notebook stress_testing.ipynb
 ```
+
