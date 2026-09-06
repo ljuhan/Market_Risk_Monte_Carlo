@@ -17,7 +17,7 @@ The 95% historical VaR backtest recorded **230 exceptions in 4,442 forecast days
 | First 3 PCA components | 89.66% | Variance of **standardized asset returns**, not weighted portfolio variance |
 | COVID-window realized 95% VaR | -5.96% | 5.26x the full-sample magnitude; descriptive comparison, not a forecast error |
 
-[Full results and plots](results/REPORT.md) · [Exact numbers](results/summary.json) · [Dated forecasts and exceptions](results/daily_backtest.csv)
+[Verification summary](VERIFICATION.md) · [Full results and plots](results/REPORT.md) · [Exact numbers](results/summary.json) · [Dated forecasts and exceptions](results/daily_backtest.csv)
 
 ![Rolling VaR backtest](results/backtest.png)
 
