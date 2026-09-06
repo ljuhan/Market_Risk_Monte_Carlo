@@ -1,103 +1,70 @@
-# Portfolio Risk Engine — VaR, Stress Testing & Factor Analysis
+# Portfolio Risk Engine — Reproducible VaR, Coverage Tests & Stress Analysis
 
-A quantitative risk model built from scratch in Python, implementing 
-three VaR methodologies, historical stress testing, and PCA factor 
-decomposition on a multi-asset portfolio.
+Python analysis of a fixed five-ETF portfolio. It compares historical and Gaussian tail estimates, evaluates rolling historical VaR, and distinguishes realized crisis-window statistics from forecasts. The current analysis uses **frozen adjusted prices from 2008-01-02 through 2026-08-31**.
 
-## Portfolio
+## Main finding
 
-5-asset diversified portfolio reflecting a typical balanced allocation:
+The 95% historical VaR backtest recorded **230 exceptions in 4,442 forecast days (5.18%, versus 5% expected)** from 2009-01-02 through 2026-08-31. Kupiec unconditional coverage was not rejected at 5% (**p = 0.589**), but Christoffersen first-order independence was rejected (**p = 0.00233**), as was combined conditional coverage (**p = 0.00839**).
 
-| Ticker | Asset Class | Weight |
-|--------|-------------|--------|
-| SPY | US Equities | 40% |
-| TLT | Long-term Treasuries | 25% |
-| GLD | Gold | 15% |
-| XLE | Energy | 10% |
-| EEM | Emerging Markets | 10% |
+**An aggregate exception rate close to target did not establish adequate conditional coverage in this sample.** There were 23 exception-to-exception transitions: the next-day hit rate was 10.0% after a hit versus about 4.92% after a non-hit. These are sample diagnostics, not proof of production model validity or a regulatory approval. No Basel traffic-light classification is used.
 
-## Methodology
+## Additional observations
 
-### 1. Value at Risk — Three Methods
+| Fixed-sample analysis | Result | Interpretation |
+|---|---|---|
+| Historical vs Gaussian 95% VaR | -1.13% vs -1.28% | Gaussian VaR is more negative in this sample |
+| Historical vs Gaussian 95% ES | -1.88% vs -1.62% | Gaussian ES is less negative despite its more conservative VaR |
+| First 3 PCA components | 89.66% | Variance of **standardized asset returns**, not weighted portfolio variance |
+| COVID-window realized 95% VaR | -5.96% | 5.26x the full-sample magnitude; descriptive comparison, not a forecast error |
 
-| Method | Approach | Key Assumption |
-|--------|----------|----------------|
-| Historical Simulation | Empirical return distribution | No distributional assumption |
-| Parametric (Normal) | Analytical normal distribution | Returns are normally distributed |
-| Monte Carlo | 100,000 simulated paths | Normal distribution with historical params |
+[Full results and plots](results/REPORT.md) · [Exact numbers](results/summary.json) · [Dated forecasts and exceptions](results/daily_backtest.csv)
 
-### 2. Stress Testing
-Portfolio performance backtested against three major crisis periods:
-- **2008 Financial Crisis** (Sep 2008 — Mar 2009)
-- **COVID Crash** (Feb 19 — Mar 23, 2020)
-- **2022 Rate Hike Cycle** (Jan — Dec 2022)
+![Rolling VaR backtest](results/backtest.png)
 
-### 3. PCA Factor Decomposition
-Principal Component Analysis decomposes portfolio variance into 
-systematic risk factors:
-- **PC1 (53.2%)** — Broad market / risk-on factor (SPY, GLD, EEM)
-- **PC2 (23.1%)** — Interest rate / safe haven factor (TLT dominant)
-- **PC3 (13.7%)** — Energy / commodity factor (XLE dominant)
+## Portfolio and definitions
 
-Just 3 factors explain 90% of portfolio variance.
+| Asset | Weight |
+|---|---:|
+| SPY | 40% |
+| TLT | 25% |
+| GLD | 15% |
+| XLE | 10% |
+| EEM | 10% |
 
-## Results
+- Daily simple adjusted-close returns; constant target weights imply frictionless **daily rebalancing**, not buy-and-hold. Costs and liquidity are not modeled.
+- Signed-return convention: VaR is the lower 5th percentile; ES is mean return at or below that threshold. More negative means a larger loss.
+- Each one-day historical VaR forecast uses the **preceding 252 returns**, never the return being tested. Separate 252-day rolling hit rates are descriptive.
+- Kupiec POF uses all observations. Independence uses adjacent hit transitions, conditional on the first observation. Combined CC adds the two LR statistics; asymptotic chi-square degrees of freedom are 1, 1 and 2, respectively.
+- Gaussian Monte Carlo draws 100,000 **portfolio returns**, not asset paths; seed 42. It is not an independent heavy-tail model.
+- PCA standardizes each asset series and analyzes the correlation structure. Portfolio weights are not inputs. Component signs/economic labels are not unique.
+- Stress VaR is calculated **inside each realized crisis window**. The baseline uses the full sample and includes those crises. No out-of-sample forecast failure is inferred from their ratio. Drawdown includes initial capital at the window start; earlier peaks are outside its scope.
 
-### VaR Comparison (95% Confidence)
+## Reproduce offline
 
-| Method | VaR | CVaR |
-|--------|-----|------|
-| Historical Simulation | -1.47% | -2.46% |
-| Parametric (Normal) | -1.71% | -2.16% |
-| Monte Carlo | -1.71% | -2.16% |
+Use Python 3.12. `requirements-lock.txt` pins the resolved environment; direct dependencies are listed in `requirements.txt`.
 
-![VaR Comparison](var_comparison.png)
-
-### Stress Test Results
-
-| Scenario | Total Return | Max Drawdown | Crisis VaR |
-|----------|-------------|--------------|------------|
-| 2008 Financial Crisis | -18.8% | -34.4% | -5.09% |
-| COVID Crash | -23.5% | -24.9% | -7.49% |
-| 2022 Rate Hikes | -9.4% | -19.7% | -1.58% |
-
-![Stress Test](stress_test.png)
-
-### Key Finding
-Baseline VaR of -1.47% expanded to -7.49% during COVID — five times 
-worse than normal-period models predicted. This demonstrates why 
-regulators (Basel III) mandate stress testing alongside VaR: models 
-trained on calm periods systematically underestimate tail risk.
-
-![PCA Decomposition](pca_decomposition.png)
-
-### VaR Backtest Results
-
-| Metric | Value |
-|--------|-------|
-| Test Period | 2009–2026 |
-| Total Trading Days | 4,370 |
-| VaR Exceptions | 231 days |
-| Exception Rate | 5.29% |
-| Basel Status | ⚠ Yellow Zone |
-
-![VaR Backtest](var_backtest.png)
-
-**Key insight:** The rolling exception rate spikes above the Basel red zone 
-(8%) during every major crisis — 2011, 2016, 2018, 2020, 2022 — confirming 
-that historical simulation VaR systematically underestimates tail risk during 
-stress periods. This motivates the use of stressed VaR and scenario analysis 
-as complements to standard VaR models.
-
-## Tech Stack
-- Python 3.10
-- pandas, numpy, scipy, scikit-learn
-- yfinance (market data)
-- matplotlib, seaborn
-
-## How to Run
 ```bash
-pip install numpy pandas matplotlib seaborn yfinance scipy scikit-learn
-jupyter notebook stress_testing.ipynb
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-lock.txt
+python scripts/run_analysis.py
+python -m pytest -q
 ```
 
+`stress_testing.ipynb` calls the same analysis functions and includes executed tables. It reads the frozen CSV, not live Yahoo data. `scripts/run_analysis.py` regenerates result tables and plots without overwriting the snapshot or test baseline. Use `--output /path/to/separate/results` for an independent rerun.
+
+## Data provenance and integrity
+
+`data/snapshot_2026-08-31/manifest.json` records the acquisition timestamp, source, date semantics, actual date range, preprocessing, and hashes of the raw vendor response and adjusted-close CSV. `analysis_config.json` is hashed too. The end date is inclusive; Yahoo's exclusive request boundary is 2026-09-01. CSV values are stored with 17 significant digits and loaded in round-trip mode.
+
+The one-time `scripts/freeze_data.py` downloads Yahoo's **Adj Close** field with `auto_adjust=False`, retaining the raw price/action fields as well. It refuses to overwrite the snapshot. The default analysis never downloads data. This is a later-acquired vendor-adjusted historical snapshot, **not point-in-time vendor data**. Historical revisions can affect a newly acquired snapshot.
+
+## Validation and limits
+
+Tests cover formula boundaries, chronology, forecast-day exclusion, a published POF reference, hand-calculated transition likelihoods, fixed-data regressions, data tampering, raw/clean CSV consistency, and independent reconstruction of headline statistics. Frozen baselines are reviewed artifacts; CI does not update them automatically. Passing tests establishes those checks, not universal financial correctness. Test networking is blocked.
+
+Parameters, tickers, and weights are retrospectively specified. No untouched strategy-selection holdout or production trading record is claimed. The tests are asymptotic and do not prove independence at every lag; short stress windows give noisy empirical tail estimates. Validation of regulatory capital models is outside this project's scope.
+
+The previous README's 5.29%, 231/4,370 and other figures could not be tied to a frozen input file; they are replaced, not presented as replicated results. `BASELINE.md` and `REFACTOR_PLAN.md` are clearly labeled historical notes. `VaR Simulation.ipynb` is a separate **legacy NVDA demonstration**, outside this validated five-asset workflow.
+
+References: [Kupiec POF](https://www.mathworks.com/help/risk/varbacktest.pof.html), [Christoffersen independence](https://www.mathworks.com/help/risk/varbacktest.cci.html), [conditional coverage](https://www.mathworks.com/help/risk/varbacktest.cc.html).

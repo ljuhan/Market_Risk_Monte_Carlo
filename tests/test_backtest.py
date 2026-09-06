@@ -6,7 +6,6 @@ import pytest
 
 from src.risk_engine.backtest import (
     backtest_var,
-    classify_backtest_exceptions,
     rolling_historical_var,
 )
 
@@ -58,7 +57,7 @@ def test_backtest_var_uses_strict_less_than_exception_rule() -> None:
     assert result["exception_rate"] == pytest.approx(1 / 3)
 
 
-def test_backtest_var_returns_structured_outputs_and_classification() -> None:
+def test_backtest_var_returns_unclassified_structured_outputs() -> None:
     index = pd.date_range("2020-01-01", periods=4, freq="D")
     actual = pd.Series([-0.10, -0.20, 0.01, -0.30], index=index)
     predicted = pd.Series([-0.05, -0.05, -0.05, -0.05], index=index)
@@ -71,28 +70,11 @@ def test_backtest_var_returns_structured_outputs_and_classification() -> None:
         "exception_count",
         "observation_count",
         "exception_rate",
-        "classification",
     }
     pd.testing.assert_series_equal(result["predicted_var"], predicted)
     assert result["exception_count"] == 3
     assert result["observation_count"] == 4
     assert result["exception_rate"] == pytest.approx(0.75)
-    assert result["classification"] == "red"
-
-
-@pytest.mark.parametrize(
-    ("rate", "expected"),
-    [
-        (0.05, "acceptable"),
-        (0.050001, "yellow"),
-        (0.08, "yellow"),
-        (0.080001, "red"),
-    ],
-)
-def test_classify_backtest_exceptions_preserves_notebook_thresholds(
-    rate: float, expected: str
-) -> None:
-    assert classify_backtest_exceptions(rate) == expected
 
 
 @pytest.mark.parametrize("returns", [pd.Series(dtype=float), pd.Series([0.01])])
@@ -131,7 +113,3 @@ def test_backtest_var_rejects_empty_nan_and_mismatched_indices() -> None:
         backtest_var(pd.Series(dtype=float), pd.Series(dtype=float))
 
 
-@pytest.mark.parametrize("rate", [-0.01, 1.01, np.nan])
-def test_classify_backtest_exceptions_rejects_invalid_rates(rate: float) -> None:
-    with pytest.raises(ValueError, match="exception_rate"):
-        classify_backtest_exceptions(rate)

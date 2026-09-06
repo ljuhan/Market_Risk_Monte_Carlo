@@ -74,9 +74,9 @@ def calculate_cumulative_return(
 def calculate_max_drawdown(
     returns: Sequence[float] | np.ndarray | pd.Series,
 ) -> float:
-    """Calculate the minimum drawdown from the local cumulative-return peak."""
+    """Drawdown from local peaks, including initial capital before first return."""
     values = _validate_returns(returns)
-    cumulative_curve = np.cumprod(1.0 + values)
+    cumulative_curve = np.r_[1.0, np.cumprod(1.0 + values)]
     rolling_max = np.maximum.accumulate(cumulative_curve)
     drawdown = (cumulative_curve - rolling_max) / rolling_max
     return float(drawdown.min())
@@ -88,7 +88,7 @@ def run_stress_scenario(
     end_date: str | pd.Timestamp,
     confidence: float = 0.95,
 ) -> dict[str, object]:
-    """Calculate notebook-equivalent metrics for an inclusive date window."""
+    """Descriptive realized metrics inside an inclusive date window, not forecasts."""
     if not isinstance(portfolio_returns, pd.Series):
         raise TypeError("portfolio_returns must be a pandas Series")
     if not isinstance(portfolio_returns.index, pd.DatetimeIndex):

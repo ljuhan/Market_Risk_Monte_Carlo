@@ -80,6 +80,8 @@ def validate_price_data(prices: pd.DataFrame, tickers: Iterable[str]) -> pd.Data
         raise ValueError("price data must have a DatetimeIndex")
     if prices.index.has_duplicates:
         raise ValueError("price data must not contain duplicate dates")
+    if not prices.index.is_monotonic_increasing:
+        raise ValueError("price dates must be sorted ascending")
     if any(ticker not in prices.columns for ticker in ticker_list):
         missing = [ticker for ticker in ticker_list if ticker not in prices.columns]
         raise ValueError(f"price data is missing ticker columns: {missing}")

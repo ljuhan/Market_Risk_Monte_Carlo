@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "data": {
+    "source": "Yahoo Finance historical prices via yfinance; Adj Close selected from auto_adjust=False response",
+    "extracted_at_utc": "2026-09-06T21:42:16.700354+00:00",
+    "actual_start": "2008-01-02",
+    "actual_end": "2026-08-31",
+    "observation_count": 4695,
+    "files_sha256": {
+      "raw_yahoo.csv": "73445f8dfe07bb526e2fa93917c7868fb16a0a8a458586c2d1640784c3e9509f",
+      "adjusted_close.csv": "dec251bbc1f39bdb3bd44a3080c211294b85bab55c1afcde50b976cbd0b2f987"
+    },
+    "config_sha256": "a44c98700db50223c470236f5f790d88053730261479c77ebbbc0e837e5e599c"
+  },
+  "return_observations": 4694,
+  "portfolio_convention": "Constant daily target weights; adjusted-close simple returns; frictionless daily rebalancing, not buy-and-hold or executable P&L",
+  "confidence": 0.95,
+  "backtest": {
+    "start": "2009-01-02",
+    "end": "2026-08-31",
+    "estimation_window": 252,
+    "observations": 4442,
+    "exceptions": 230,
+    "exception_rate": 0.051778478162989645,
+    "expected_exception_rate": 0.050000000000000044,
+    "transition_counts": {
+      "n00": 4004,
+      "n01": 207,
+      "n10": 207,
+      "n11": 23
+    },
+    "kupiec_pof": {
+      "lr_statistic": 0.2925245781518697,
+      "degrees_of_freedom": 1,
+      "p_value": 0.5886072448874013,
+      "significance": 0.05,
+      "reject_null": false,
+      "status": "do_not_reject"
+    },
+    "christoffersen_independence": {
+      "lr_statistic": 9.267999896437914,
+      "degrees_of_freedom": 1,
+      "p_value": 0.0023319221498484775,
+      "significance": 0.05,
+      "reject_null": true,
+      "status": "reject"
+    },
+    "christoffersen_conditional_coverage": {
+      "lr_statistic": 9.560524474589783,
+      "degrees_of_freedom": 2,
+      "p_value": 0.008393797512098795,
+      "significance": 0.05,
+      "reject_null": true,
+      "status": "reject"
+    },
+    "warnings": []
+  },
+  "full_sample_methods": {
+    "Historical": {
+      "var": -0.01133455178213293,
+      "expected_shortfall": -0.018801222150478487
+    },
+    "Gaussian": {
+      "var": -0.012812205771962003,
+      "expected_shortfall": -0.016160362335113615
+    },
+    "Monte Carlo (Gaussian draws)": {
+      "var": -0.012801272466727012,
+      "expected_shortfall": -0.016177223244353188
+    }
+  },
+  "pca": {
+    "input": "StandardScaler-transformed five-asset returns, without portfolio weights",
+    "explained_variance_ratio": [
+      0.5285719503201382,
+      0.23131513860147215,
+      0.1367121498394395,
+      0.07088458828017391,
+      0.0325161729587763
+    ],
+    "first_two_cumulative": 0.7598870889216103,
+    "first_three_cumulative": 0.8965992387610497
+  },
+  "stress_scenarios": {
+    "2008 Financial Crisis": {
+      "start": "2008-09-02",
+      "end": "2009-03-31",
+      "observations": 146,
+      "cumulative_return": -0.1692464895773531,
+      "max_drawdown": -0.26362873505911444,
+      "realized_window_var": -0.036103275181317465,
+      "magnitude_ratio_to_full_sample_var": 3.185240658411247,
+      "backtest_observations": 61,
+      "backtest_exceptions": 2,
+      "backtest_exception_rate": 0.03278688524590164
+    },
+    "COVID Crash": {
+      "start": "2020-02-19",
+      "end": "2020-03-23",
+      "observations": 24,
+      "cumulative_return": -0.20900101041866737,
+      "max_drawdown": -0.22477056331552236,
+      "realized_window_var": -0.05959452783783835,
+      "magnitude_ratio_to_full_sample_var": 5.257775427148288,
+      "backtest_observations": 24,
+      "backtest_exceptions": 9,
+      "backtest_exception_rate": 0.375
+    },
+    "2022 Rate Hikes": {
+      "start": "2022-01-03",
+      "end": "2022-12-30",
+      "observations": 251,
+      "cumulative_return": -0.12442227864484101,
+      "max_drawdown": -0.19060713450646288,
+      "realized_window_var": -0.015899884326020224,
+      "magnitude_ratio_to_full_sample_var": 1.4027801567843023,
+      "backtest_observations": 251,
+      "backtest_exceptions": 29,
+      "backtest_exception_rate": 0.11553784860557768
+    }
+  }
+}

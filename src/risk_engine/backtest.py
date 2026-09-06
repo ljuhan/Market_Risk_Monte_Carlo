@@ -18,6 +18,8 @@ def _validate_series(values: pd.Series, name: str) -> None:
         raise ValueError(f"{name} must contain only numeric values")
     if not np.isfinite(values.to_numpy(dtype=float)).all():
         raise ValueError(f"{name} must contain only finite values")
+    if values.index.has_duplicates or not values.index.is_monotonic_increasing:
+        raise ValueError(f"{name} must have unique, ascending indices")
 
 
 def _validate_confidence(confidence: float) -> float:
@@ -54,21 +56,6 @@ def rolling_historical_var(
     return pd.Series(predicted_var, index=predicted_dates)
 
 
-def classify_backtest_exceptions(exception_rate: float) -> str:
-    """Classify a rate using the notebook's simplified thresholds."""
-    if isinstance(exception_rate, bool) or not isinstance(exception_rate, Real):
-        raise ValueError("exception_rate must be a finite number between 0 and 1")
-    exception_rate = float(exception_rate)
-    if not np.isfinite(exception_rate) or not 0.0 <= exception_rate <= 1.0:
-        raise ValueError("exception_rate must be a finite number between 0 and 1")
-
-    if exception_rate <= 0.05:
-        return "acceptable"
-    if exception_rate <= 0.08:
-        return "yellow"
-    return "red"
-
-
 def backtest_var(
     actual_returns: pd.Series,
     predicted_var: pd.Series,
@@ -90,5 +77,4 @@ def backtest_var(
         "exception_count": exception_count,
         "observation_count": observation_count,
         "exception_rate": exception_rate,
-        "classification": classify_backtest_exceptions(exception_rate),
     }

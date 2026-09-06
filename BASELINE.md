@@ -1,3 +1,5 @@
+> Historical preservation-refactor note. This document describes the earlier, unverified workflow. For the current frozen analysis, see README.md and results/REPORT.md.
+
 # Risk Engine Baseline
 
 Baseline capture date: **2026-07-10**

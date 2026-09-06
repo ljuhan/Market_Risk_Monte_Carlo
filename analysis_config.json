@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "start_date_inclusive": "2008-01-01",
+  "end_date_inclusive": "2026-08-31",
+  "tickers": ["SPY", "TLT", "GLD", "XLE", "EEM"],
+  "weights": [0.40, 0.25, 0.15, 0.10, 0.10],
+  "confidence": 0.95,
+  "estimation_window": 252,
+  "rolling_diagnostic_window": 252,
+  "test_significance": 0.05,
+  "monte_carlo_draws": 100000,
+  "random_seed": 42,
+  "scenarios": {
+    "2008 Financial Crisis": ["2008-09-01", "2009-03-31"],
+    "COVID Crash": ["2020-02-19", "2020-03-23"],
+    "2022 Rate Hikes": ["2022-01-01", "2022-12-31"]
+  }
+}

@@ -1,3 +1,5 @@
+> Historical preservation-refactor note. This document describes the earlier, unverified workflow. For the current frozen analysis, see README.md and results/REPORT.md.
+
 # Risk Engine Audit and Refactor Plan
 
 ## Scope and Current State

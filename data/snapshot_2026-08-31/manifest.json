@@ -1,0 +1,41 @@
+{
+  "source": "Yahoo Finance historical prices via yfinance; Adj Close selected from auto_adjust=False response",
+  "source_urls": [
+    "https://finance.yahoo.com/quote/SPY/history/",
+    "https://finance.yahoo.com/quote/TLT/history/",
+    "https://finance.yahoo.com/quote/GLD/history/",
+    "https://finance.yahoo.com/quote/XLE/history/",
+    "https://finance.yahoo.com/quote/EEM/history/"
+  ],
+  "extracted_at_utc": "2026-09-06T21:42:16.700354+00:00",
+  "requested_start_inclusive": "2008-01-01",
+  "requested_end_inclusive": "2026-08-31",
+  "yfinance_end_exclusive": "2026-09-01",
+  "actual_start": "2008-01-02",
+  "actual_end": "2026-08-31",
+  "observation_count": 4695,
+  "tickers": [
+    "SPY",
+    "TLT",
+    "GLD",
+    "XLE",
+    "EEM"
+  ],
+  "missing_rows_removed": [],
+  "timezone": "Date-only US exchange sessions (America/New_York); timezone removed without date conversion",
+  "cleaning": "Select Adj Close; retain configured ticker order; sort ascending; restrict inclusive dates; drop rows missing any of five assets; no forward fill",
+  "limitations": "Vendor-adjusted historical snapshot acquired after the sample end; not point-in-time vendor data. Later vendor revisions are not applied to this snapshot.",
+  "config_sha256": "a44c98700db50223c470236f5f790d88053730261479c77ebbbc0e837e5e599c",
+  "files_sha256": {
+    "raw_yahoo.csv": "73445f8dfe07bb526e2fa93917c7868fb16a0a8a458586c2d1640784c3e9509f",
+    "adjusted_close.csv": "dec251bbc1f39bdb3bd44a3080c211294b85bab55c1afcde50b976cbd0b2f987"
+  },
+  "python": "3.12.14",
+  "packages": {
+    "numpy": "2.2.6",
+    "pandas": "2.2.3",
+    "scipy": "1.15.3",
+    "scikit-learn": "1.6.1",
+    "yfinance": "0.2.65"
+  }
+}

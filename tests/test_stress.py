@@ -38,7 +38,7 @@ def test_run_stress_scenario_preserves_inclusive_window_and_notebook_metrics() -
     window = portfolio_returns.iloc[1:4]
 
     expected_cumulative = float(np.prod(1.0 + window.to_numpy()) - 1.0)
-    cumulative_curve = np.cumprod(1.0 + window.to_numpy())
+    cumulative_curve = np.r_[1.0, np.cumprod(1.0 + window.to_numpy())]
     expected_drawdown = float(
         ((cumulative_curve - np.maximum.accumulate(cumulative_curve))
          / np.maximum.accumulate(cumulative_curve)).min()
@@ -104,3 +104,7 @@ def test_run_stress_scenario_rejects_invalid_confidence(confidence: float) -> No
 
     with pytest.raises(ValueError, match="confidence"):
         run_stress_scenario(returns, "2020-01-01", "2020-01-02", confidence)
+
+
+def test_drawdown_counts_first_loss_from_initial_capital():
+    assert calculate_max_drawdown([-0.20, 0.05]) == pytest.approx(-0.20)
